@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1"/>
+<title>Message App</title>
+<style>
+	.message{
+		width: 218px;
+		max-height: 200px;
+		min-height: 200px;
+		overflow:scroll;
+		background-color:#dadada;
+		margin-bottom: 2px;
+	}
+</style>
+</head>
+<body>
+	<h1>Message App</h1>
+	<div class="message" id="message">
+	</div>
+	<input type="text" id="messageBox" placeholder="message here..."/>
+	<input type="text" id="socketId" placeholder="user id"/>
+ 	<button>Send</button>
+	
+	<script src="http://159.65.14.144:8080/static/js/jquery.min.js"></script>
+	<script src="http://159.65.14.144:8080/static/js/socket.io/socket.io.js"></script>
+	<script>
+		var username = prompt("What is your name?", "Anonymous" + Math.floor(Math.random() * 100));
+	
+		var socket = io.connect('http://localhost:4444/');	
+		socket.on('connect', function(){
+			console.log('connected to server', socket);
+		});
+		
+		$('button').click(function(){
+			var msg = $('#messageBox').val();
+			console.log(msg);
+			
+			var payload = {
+				'username': username,
+				'socketId': $('#socketId').val(),
+				'message': msg
+			};
+			socket.emit('new message', payload);
+		});
+		
+		socket.on('message', function(data){
+			console.log(data);
+			$('#message').append(`<p>${data.username}: ${data.message}</p>`);
+		});
+		
+	</script>
+</body>
+</html>
